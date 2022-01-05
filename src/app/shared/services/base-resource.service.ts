@@ -10,14 +10,18 @@ export abstract class BaseResourceService<T extends BaseResourceModel> {
 
     protected http: HttpClient
 
-    constructor(protected apiPath: string, protected injector: Injector){
+    constructor(
+        protected apiPath: string,
+        protected injector: Injector,
+        protected jsonToResourceFn: (jsonData: any) => T
+    ) {
         this.http = injector.get(HttpClient);
     }
 
     getAll(): Observable<T[]> {
         return this.http.get(this.apiPath).pipe(
-            catchError(this.handleError),
-            map(this.jsonDataToResources)
+            map(this.jsonDataToResources.bind(this)),
+            catchError(this.handleError)
         )
     }
 
@@ -25,15 +29,15 @@ export abstract class BaseResourceService<T extends BaseResourceModel> {
         const url = `${this.apiPath}/${id}`;
 
         return this.http.get(url).pipe(
-            catchError(this.handleError),
-            map(this.jsonDataToResource)
+            map(this.jsonDataToResource.bind(this)),
+            catchError(this.handleError)
         )
     }
 
     create(resource: T): Observable<T> {
         return this.http.post(this.apiPath, resource).pipe(
-            catchError(this.handleError),
-            map(this.jsonDataToResource)
+            map(this.jsonDataToResource.bind(this)),
+            catchError(this.handleError)
         )
     }
 
@@ -41,8 +45,9 @@ export abstract class BaseResourceService<T extends BaseResourceModel> {
         const url = `${this.apiPath}/${resource.id}`;
 
         return this.http.put(url, resource).pipe(
-            catchError(this.handleError),
-            map(() => resource)
+            map(() => resource),
+            catchError(this.handleError)
+
         )
     }
 
@@ -60,7 +65,9 @@ export abstract class BaseResourceService<T extends BaseResourceModel> {
 
     protected jsonDataToResources(JsonData: any[]): T[] {
         const resources: T[] = [];
-        JsonData.forEach(element => resources.push(element as T))
+        JsonData.forEach(
+            element => resources.push(this.jsonToResourceFn(element))
+        )
         return resources;
     }
 
@@ -69,8 +76,8 @@ export abstract class BaseResourceService<T extends BaseResourceModel> {
         return throwError(error);
     }
 
-    protected jsonDataToResource(JsonData: any): T {
-        return JsonData as T;
+    protected jsonDataToResource(jsonData: any): T {
+        return this.jsonToResourceFn(jsonData);
     }
 
 }
