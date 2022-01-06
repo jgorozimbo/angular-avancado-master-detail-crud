@@ -47,6 +47,7 @@
 
           <div class="text-danger" *ngIf="entryForm.get('name').invalid && entryForm.get('name').touched">
             <div *ngIf="entryForm.get('name').errors.required">campo obrigatório</div>
+            <div *ngIf="entryForm.get('name').errors.minlength">campo deve ter no mínimo 2 caracteres</div>
           </div>
         </div>
 
