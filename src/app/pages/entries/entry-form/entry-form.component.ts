@@ -7,6 +7,8 @@ import { EntryService } from '../shared/entry.service';
 import { Category } from '../../categories/shared/category.model';
 import { CategoryService } from '../../categories/shared/category.service';
 
+import { PrimeNGConfig } from 'primeng/api';
+
 @Component({
   selector: 'app-entry-form',
   templateUrl: './entry-form.component.html',
@@ -43,12 +45,24 @@ export class EntryFormComponent extends BaseResourceFormComponent<Entry> impleme
   constructor(
     protected entryService: EntryService,
     protected categoryService: CategoryService,
-    protected injector: Injector
+    protected injector: Injector,
+    private config: PrimeNGConfig
   ) {
     super(injector, new Entry, entryService, Entry.fromJson)
   }
 
   ngOnInit() {
+
+    this.config.setTranslation({
+      dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+      dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+      dayNamesMin: ['Do', 'Se', 'Te', 'Qu', 'Qu', 'Se', 'Sa'],
+      monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+      monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+      today: 'Hoje',
+      clear: 'Limpar'
+    })
+
     this.loadCategories();
     super.ngOnInit();
   }
